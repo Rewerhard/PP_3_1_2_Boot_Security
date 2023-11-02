@@ -43,7 +43,7 @@ public class User implements UserDetails {
     private int age;
     @NotBlank(message = "Login не может быть пустым")
     @Size(min = 2, max = 8, message = "Login от 2 до 8 символов")
-    @Column(name = "user_user_name")
+    @Column(name = "user_user_name", unique = true)
     private String userName;
     @NotBlank(message = "Password не может быть пустым")
     @Column(name = "user_password")

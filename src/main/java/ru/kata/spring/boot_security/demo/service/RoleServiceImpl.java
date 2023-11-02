@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.dao.RoleRepository;
 import ru.kata.spring.boot_security.demo.entity.Role;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -24,13 +25,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role getRole(Long id) {
-        Optional<Role> optionalRole = roleRepository.findById(id);
-        Role role;
-        if (optionalRole.isPresent()) {
-            role = optionalRole.get();
-        } else {
-            throw new RuntimeException("Нету роли");
-        }
-        return role;
+        return roleRepository.findById(id).
+                orElseThrow(() -> new EntityNotFoundException("Роль не найдена"));
     }
 }

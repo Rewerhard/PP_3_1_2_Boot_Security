@@ -23,7 +23,7 @@
         <input type="hidden" th:field="*{id}"/>
 
         <input type="text" th:field="*{userName}" class="form-control mb-1 col-4" placeholder="login">
-        <p style="color: red" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"> Age error</p>
+        <p style="color: red" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"> Login error</p>
 
 
         <input type="text" th:field="*{name}" class="form-control mb-1 col-4" placeholder="name">

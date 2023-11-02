@@ -16,4 +16,6 @@ public interface UserService {
     void deleteUserById(Long id);
 
     User findUserByName(String name);
+
+    void passwordChanged(User user, String encode);
 }

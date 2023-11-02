@@ -1,7 +1,6 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,18 +16,18 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 import javax.validation.Valid;
 
 
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
     private final UserService userService;
     private final RoleService roleService;
-    private final BCryptPasswordEncoder encoder;
+
 
     @Autowired
-    public AdminController(UserService userService, RoleService roleService, BCryptPasswordEncoder encoder) {
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.encoder = encoder;
     }
 
     @GetMapping("/list")
@@ -47,30 +46,20 @@ public class AdminController {
 
     @PostMapping("/saveUser")
     public String saveUser(@ModelAttribute("user") @Valid User user, BindingResult result,
-                           @RequestParam("roles") String[] roles, Model model) {
-
+                           Model model) {
         if (result.hasErrors()) { //valid
             model.addAttribute("user", user);
             model.addAttribute("roles", roleService.findAll());
             return "user-form";
         }
         String encode = user.getPassword();        //new user
-        passwordChanged(user, encode);
-        for (String r : roles) {
-            user.addRole(roleService.getRole(Long.valueOf(r)));
-        }
+        userService.passwordChanged(user, encode);
         userService.add(user);
         return "redirect:/admin/list";
     }
 
-    private void passwordChanged(User user, String encode) {
-        encode = encoder.encode(encode);
-        user.setPassword(encode);
-    }
-
     @GetMapping("/showFormForUpdate")
     public String showFormForUpdate(@RequestParam("userId") Long id, Model model) {
-
         User user = userService.getUserById(id);
         model.addAttribute("user", user);
         model.addAttribute("roles", roleService.findAll());
@@ -79,7 +68,7 @@ public class AdminController {
 
     @PostMapping("/updateUser")
     public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult result,
-                             @RequestParam("roles") String[] roles, Model model) {
+                             Model model) {
         if (result.hasErrors()) {
             model.addAttribute("user", user);
             model.addAttribute("roles", roleService.findAll());
@@ -89,11 +78,7 @@ public class AdminController {
         if (encode.isEmpty()) {
             user.setPassword(userService.getUserById(user.getId()).getPassword());
         } else {
-            passwordChanged(user, encode);
-        }
-        user.getRoles().clear();
-        for (String r : roles) {
-            user.addRole(roleService.getRole(Long.valueOf(r)));
+            userService.passwordChanged(user, encode);
         }
         userService.update(user);
         return "redirect:/admin/list";
